@@ -43,6 +43,10 @@ class University(ABC):
         return self._specs
 
     @abstractmethod
+    def get_code_name(self) -> str:
+        ...
+
+    @abstractmethod
     def get_info(self) -> UniversityInfo:
         ...
 
@@ -51,5 +55,6 @@ class University(ABC):
         ...
 
     @abstractmethod
-    def parse_all_specs_net(self, specs: dict) -> list[tuple[str, list[RangedAbiturientData]]]:
+    def parse_all_specs_net(self) -> list[tuple[str, list[RangedAbiturientData]]]:
+        # SPECS should be hardcoded inside files.
         ...

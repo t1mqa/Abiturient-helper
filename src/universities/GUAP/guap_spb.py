@@ -1,5 +1,3 @@
-from typing import Tuple, List
-
 import src.utils.requester as requester
 import src.utils.bsParser as bsParser
 
@@ -17,6 +15,9 @@ class GUAP(University):
                               "Санкт-Петербургский Государственный Университет Аэрокосмического Приборостроения",
                               "Санкт-Петербург")
 
+    def get_code_name(self) -> str:
+        return "GUAP"
+
     def parse_spec_net(self, link) -> tuple[str, list[RangedAbiturientData]]:
         raw_data = requester.request_it(link)
         table = bsParser.get_table(raw_data.content)
@@ -24,9 +25,9 @@ class GUAP(University):
         normalized_table = [RangedAbiturientData(**x) for x in table]
         return name, normalized_table
 
-    def parse_all_specs_net(self, specs: dict = SPECS) -> list[tuple[str, list[RangedAbiturientData]]]:
+    def parse_all_specs_net(self) -> list[tuple[str, list[RangedAbiturientData]]]:
         data = []
-        for _, link in specs.items():
+        for _, link in self._specs.items():
             # I can replace items with values
             data.append(self.parse_spec_net(link))
         return data
