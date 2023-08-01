@@ -30,7 +30,3 @@ class GUAP(University):
             # I can replace items with values
             data.append(self.parse_spec_net(link))
         return data
-
-
-a = GUAP()
-print(a.parse_all_specs_net())
