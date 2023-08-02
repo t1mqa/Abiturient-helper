@@ -44,6 +44,7 @@ def fill_spec_table(spec: str, data: list[RangedAbiturientData]):
     if conn is not None:
         cur: cursor = conn.cursor()
         spec = spec.replace(".", "_")
+        cur.execute(f"""TRUNCATE TABLE {spec};""")
         insert_statement = f"""
                 INSERT INTO {spec} (
                     SNILS,
@@ -90,7 +91,7 @@ def create_users_table():
     if conn is not None:
         cur: cursor = conn.cursor()
         cur.execute(f"""CREATE TABLE IF NOT EXISTS tgUsers (
-                        tgId VARCHAR,
+                        tgId INT,
                         status VARCHAR,
                         SNILS VARCHAR,
                         universities VARCHAR[]
@@ -104,7 +105,7 @@ def create_user(tg_user) -> bool:
     if conn is not None:
         cur: cursor = conn.cursor()
         # First, lets check that user not exists
-        cur.execute(f"""SELECT COUNT(*) FROM tgUsers WHERE tgId = (%s)""", (tg_user.tgId, ))
+        cur.execute(f"""SELECT COUNT(*) FROM tgUsers WHERE tgId = (%s)""", (tg_user.tgId,))
         if cur.fetchone()[0] > 0:
             return False
         cur.execute(f"""
@@ -113,3 +114,69 @@ def create_user(tg_user) -> bool:
         """, (tg_user.tgId, "waiting SNILS", "", []))
     conn.close()
     return True
+
+
+def check_user_status(user_id) -> str:
+    status = 'free'
+    conn: connection = get_connection()
+    if conn is not None:
+        cur: cursor = conn.cursor()
+        cur.execute("""SELECT status FROM tgUsers WHERE tgId = %s;""", (user_id,))
+        status = cur.fetchone()[0]
+    conn.close()
+    return status
+
+
+def set_user_status(user_id, status):
+    conn: connection = get_connection()
+    if conn is not None:
+        cur: cursor = conn.cursor()
+        cur.execute("""UPDATE tgusers SET status = %s WHERE tgId = %s;""",
+                    (status, user_id,))
+    conn.close()
+    return
+
+
+def set_user_snils(user_id, snils):
+    conn: connection = get_connection()
+    if conn is not None:
+        cur: cursor = conn.cursor()
+        cur.execute("""UPDATE tgusers SET SNILS = %s WHERE tgId = %s;""",
+                    (snils, user_id,))
+    conn.close()
+    return
+
+
+def check_user_snils(user_id) -> str:
+    snils = '0'
+    conn: connection = get_connection()
+    if conn is not None:
+        cur: cursor = conn.cursor()
+        cur.execute("""SELECT snils FROM tgUsers WHERE tgId = %s;""", (user_id,))
+        snils = cur.fetchone()[0]
+    conn.close()
+    return snils
+
+
+def get_info_by_snils_db(snils, spec):
+    conn: connection = get_connection()
+    data = []
+    if conn is not None:
+        cur: cursor = conn.cursor()
+        query = f"SELECT * FROM {spec} WHERE SNILS = %s;"
+        cur.execute(query, (snils,))
+        data = cur.fetchone()
+    conn.close()
+    return data
+
+
+def get_all_tg_users() -> list:
+    conn: connection = get_connection()
+    data = []
+    if conn is not None:
+        cur: cursor = conn.cursor()
+        query = f"SELECT tgId, snils FROM tgUsers;"
+        cur.execute(query)
+        data = cur.fetchall()
+    conn.close()
+    return data

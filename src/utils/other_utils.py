@@ -31,3 +31,14 @@ def get_data_from_file(file_path):
     exec(file_contents, globals_dict)
     data = globals_dict.get('SPECS')
     return data
+
+
+def configure_user_positions_message(data) -> str:
+    message = "Ваши места на данный момент:\n"
+    for uni in data:
+        message += f"\n{uni}\n(0 - участвует в конкурсе по другому приоритету)"
+        for spec in data[uni]:
+            arr = data[uni][spec]
+            message += (f"\n\n{spec}:\nПриоритет: {arr[1]}\n"
+                        f"Позиция в списке ВУЗА: {arr[3]}\n")
+    return message

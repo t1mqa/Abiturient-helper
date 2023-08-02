@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from databases.db_init import get_spec
+from databases.db_init import get_spec, get_info_by_snils_db
 from src.universities.uni_dataclasses import UniversityInfo, RangedAbiturientData
 
 
@@ -39,6 +39,10 @@ class University(ABC):
         data = []
         for _, link in self._specs.items():
             data.append(self.parse_spec_net(link))
+        return data
+
+    def get_place_by_snils(self, snils, spec):
+        data = get_info_by_snils_db(snils, spec)
         return data
 
     @abstractmethod
