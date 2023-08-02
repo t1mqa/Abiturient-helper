@@ -83,3 +83,33 @@ def get_spec(spec_db_code: str) -> list[RangedAbiturientData]:
             ranged_abiturient = RangedAbiturientData(*row)
             ranged_abiturients.append(ranged_abiturient)
         return ranged_abiturients
+
+
+def create_users_table():
+    conn: connection = get_connection()
+    if conn is not None:
+        cur: cursor = conn.cursor()
+        cur.execute(f"""CREATE TABLE IF NOT EXISTS tgUsers (
+                        tgId VARCHAR,
+                        status VARCHAR,
+                        SNILS VARCHAR,
+                        universities VARCHAR[]
+                        );
+                         """)
+    conn.close()
+
+
+def create_user(tg_user) -> bool:
+    conn: connection = get_connection()
+    if conn is not None:
+        cur: cursor = conn.cursor()
+        # First, lets check that user not exists
+        cur.execute(f"""SELECT COUNT(*) FROM tgUsers WHERE tgId = (%s)""", (tg_user.tgId, ))
+        if cur.fetchone()[0] > 0:
+            return False
+        cur.execute(f"""
+            INSERT INTO tgUsers (tgId, status, SNILS, universities)
+            VALUES (%s, %s, %s, %s)
+        """, (tg_user.tgId, "waiting SNILS", "", []))
+    conn.close()
+    return True

@@ -3,6 +3,7 @@ This script is running near main.py
 
 Refreshing all databases every 15 minutes.
 """
+import time
 
 from src.utils.other_utils import get_data_from_file, get_project_abspath
 from databases.db_init import create_spec_table, fill_spec_table
@@ -21,4 +22,6 @@ if __name__ == '__main__':
                 create_spec_table(f"GUAP_{spec}")
                 data = uni.parse_spec_net(link)
                 fill_spec_table(f"GUAP_{spec}", data[1])
-        break
+        current_hour, current_minute = [int(time.strftime("%H")), int(time.strftime("%M"))]
+        print(f"Updated at: {current_hour:02d}:{current_minute:02d}")
+        time.sleep(60)

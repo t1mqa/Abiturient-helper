@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from src.utils.other_utils import snils_normalize
 
 
 def get_table_name_guap(table: requests.Response.content) -> str:
@@ -17,7 +18,7 @@ def get_table_guap(table: requests.Response.content) -> list:
     for row in table.select('tbody tr'):
         cells = row.select('td')
         row_data = {
-            'SNILS': cells[1].text.strip(),
+            'SNILS': snils_normalize(cells[1].text.strip()),
             'priority': int(cells[2].text.strip()) if cells[2].text.strip().isnumeric() else 1,
             'total_points': int(cells[3].text.strip()) if cells[3].text.strip().isnumeric() else 0,
             'exam_points': int(cells[4].text.strip()) if cells[4].text.strip().isnumeric() else 0,

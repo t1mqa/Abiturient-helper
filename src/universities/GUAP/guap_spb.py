@@ -25,7 +25,3 @@ class GUAP(University):
         name = bsParser.get_table_name_guap(raw_data.content)
         normalized_table = [RangedAbiturientData(**x) for x in table]
         return name, normalized_table
-
-
-a = GUAP()
-print(a.parse_all_specs_db()[3])

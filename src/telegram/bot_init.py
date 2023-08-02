@@ -1,4 +1,5 @@
 import telebot
+from src.telegram import bot_logic
 
 
 class Bot(telebot.TeleBot):
@@ -7,13 +8,8 @@ class Bot(telebot.TeleBot):
         self.register_handlers()
 
     def register_handlers(self):
-        @self.message_handler(commands=['start'])
-        def handle_start(message):
-            self.send_message(message.chat.id, "Привет!\n"
-                                               "Это бот, помогающий отследить вашу позицию в конкурсных "
-                                               "списках абитуриентов.\n\n"
-                                               "Для начала работы пришлите свой *СНИЛС.*")
+        self.register_message_handler(lambda message: bot_logic.handle_start(self, message), commands=['start'])
+        self.register_message_handler(lambda message: bot_logic.handle_text(self, message), content_types=['text'])
 
-        @self.message_handler(content_types=['text'])
-        def handle_text(message):
-            self.send_message(message.chat.id, f"Эхо: {message.text}")
+
+
