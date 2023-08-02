@@ -1,7 +1,7 @@
 import psycopg2
 from psycopg2.extensions import connection, cursor
 from databases.db_config import host, user, password, db_name
-from src.universities.university_init import RangedAbiturientData
+from src.universities.uni_dataclasses import RangedAbiturientData
 from src.utils.other_utils import snils_normalize
 
 
@@ -70,3 +70,16 @@ def fill_spec_table(spec: str, data: list[RangedAbiturientData]):
         finally:
             cur.close()
             conn.close()
+
+
+def get_spec(spec_db_code: str) -> list[RangedAbiturientData]:
+    conn: connection = get_connection()
+    if conn is not None:
+        cur: cursor = conn.cursor()
+        cur.execute(f"""SELECT * FROM {spec_db_code};""")
+        rows = cur.fetchall()
+        ranged_abiturients = []
+        for row in rows:
+            ranged_abiturient = RangedAbiturientData(*row)
+            ranged_abiturients.append(ranged_abiturient)
+        return ranged_abiturients

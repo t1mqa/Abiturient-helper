@@ -1,27 +1,6 @@
-from dataclasses import dataclass
 from abc import ABC, abstractmethod
-
-
-@dataclass
-class UniversityInfo:
-    name: str
-    full_name: str
-    location: str
-    # Updatable for other projects
-
-
-@dataclass
-class RangedAbiturientData:
-    SNILS: str
-    priority: int
-    total_points: int
-    exam_points: int
-    achievements_points: int
-    isOriginal: bool
-    isQuota: bool
-    isHigherPriority: bool
-    innerPosition: int
-    examResults: str  # TODO: dict if needed
+from databases.db_init import get_spec
+from src.universities.uni_dataclasses import UniversityInfo, RangedAbiturientData
 
 
 class University(ABC):
@@ -42,6 +21,26 @@ class University(ABC):
     def get_specs(self):
         return self._specs
 
+    def parse_spec_db(self, spec_code: str) -> list[RangedAbiturientData]:
+        spec_code = spec_code.replace(".", "_")
+        db_name = f"{self.get_code_name()}_{spec_code}"
+        return get_spec(db_name)
+
+    def parse_all_specs_db(self) -> list[str, list[RangedAbiturientData]]:
+        data: list = []
+        for name, _ in self._specs.items():
+            spec_code = name.replace(".", "_")
+            db_name = f"{self.get_code_name()}_{spec_code}"
+            print(db_name)
+            data.append([name, get_spec(db_name)])
+        return data
+
+    def parse_all_specs_net(self) -> list[tuple[str, list[RangedAbiturientData]]]:
+        data = []
+        for _, link in self._specs.items():
+            data.append(self.parse_spec_net(link))
+        return data
+
     @abstractmethod
     def get_code_name(self) -> str:
         ...
@@ -52,9 +51,4 @@ class University(ABC):
 
     @abstractmethod
     def parse_spec_net(self, link) -> tuple[str, list[RangedAbiturientData]]:
-        ...
-
-    @abstractmethod
-    def parse_all_specs_net(self) -> list[tuple[str, list[RangedAbiturientData]]]:
-        # SPECS should be hardcoded inside files.
         ...

@@ -1,7 +1,8 @@
 import src.utils.requester as requester
 import src.utils.bsParser as bsParser
 
-from src.universities.university_init import University, UniversityInfo, RangedAbiturientData
+from src.universities.university_init import University
+from src.universities.uni_dataclasses import UniversityInfo, RangedAbiturientData
 from src.universities.GUAP.specs import SPECS
 
 
@@ -20,14 +21,11 @@ class GUAP(University):
 
     def parse_spec_net(self, link) -> tuple[str, list[RangedAbiturientData]]:
         raw_data = requester.request_it(link)
-        table = bsParser.get_table(raw_data.content)
-        name = bsParser.get_table_name(raw_data.content)
+        table = bsParser.get_table_guap(raw_data.content)
+        name = bsParser.get_table_name_guap(raw_data.content)
         normalized_table = [RangedAbiturientData(**x) for x in table]
         return name, normalized_table
 
-    def parse_all_specs_net(self) -> list[tuple[str, list[RangedAbiturientData]]]:
-        data = []
-        for _, link in self._specs.items():
-            # I can replace items with values
-            data.append(self.parse_spec_net(link))
-        return data
+
+a = GUAP()
+print(a.parse_all_specs_db()[3])

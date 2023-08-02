@@ -2,14 +2,14 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def get_table_name(table: requests.Response.content) -> str:
+def get_table_name_guap(table: requests.Response.content) -> str:
     soup = BeautifulSoup(table, 'html.parser')
     name_elem = soup.select_one("body > main > div:nth-child(3) > div:nth-child(6) > h3")
     name = name_elem.text
     return name
 
 
-def get_table(table: requests.Response.content) -> list:
+def get_table_guap(table: requests.Response.content) -> list:
     soup = BeautifulSoup(table, 'html.parser')
     table_element = soup.select_one("body > main > div:nth-child(3) > div:nth-child(9) > div.table-responsive")
     table = table_element.find('table', class_='table-hover')
